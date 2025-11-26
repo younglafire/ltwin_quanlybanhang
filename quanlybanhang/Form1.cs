@@ -20,6 +20,20 @@ namespace quanlybanhang
             LoadAllItems();
         }
 
+        private void LoadAllCustomers()
+        {
+            using (var conn = new SqlConnection(connectstring))
+            using (var cmd = new SqlCommand(
+                "SELECT MAKH AS [Mã], TENKH AS [Tên], DIACHI AS [Địa chỉ], SDT AS [SĐT] FROM KHACHHANG", conn))
+            using (var adt = new SqlDataAdapter(cmd))
+            {
+                var dt = new DataTable();
+                adt.Fill(dt);
+                dataGridView2.DataSource = dt;
+                dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
+        }
+
         private void LoadAllItems()
         {
             try
@@ -180,6 +194,35 @@ namespace quanlybanhang
                 }
             }
         }
+        private void btnThemKH_Click(object sender, EventArgs e)
+        {
+            using (var conn = new SqlConnection(connectstring))
+            {
+                string strInsert = "INSERT INTO KHACHHANG (MAKH, TENKH, DIACHI, SDT) VALUES (@makh, @tenkh, @diachi, @sdt)";
+                using (var comm = new SqlCommand(strInsert, conn))
+                {
+                    comm.Parameters.AddWithValue("@makh", txtMAKH.Text);
+                    comm.Parameters.AddWithValue("@tenkh", txtTENKH.Text);
+                    comm.Parameters.AddWithValue("@diachi", txtDIACHI.Text);
+                    comm.Parameters.AddWithValue("@sdt", txtSDT.Text);
+
+                    try
+                    {
+                        conn.Open();
+                        comm.ExecuteNonQuery();
+                        MessageBox.Show("Thêm khách hàng thành công!");
+                        LoadAllCustomers();
+                    }
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == 2627 || ex.Number == 2601)
+                            MessageBox.Show("Không thể nhập trùng mã KH!");
+                        else
+                            MessageBox.Show("Lỗi khi thêm khách hàng: " + ex.Message);
+                    }
+                }
+            }
+        }
 
         private void button4_Click(object sender, EventArgs e)
         {
@@ -216,6 +259,16 @@ namespace quanlybanhang
                     MessageBox.Show("Lỗi kết nối: " + ex.Message);
                 }
             }
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
