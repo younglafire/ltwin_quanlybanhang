@@ -33,7 +33,11 @@ namespace quanlybanhang
                 conn.Open();
                 cmd = new SqlCommand(
                     "select TENVT as N'Tên', " +
-                    "GIAMUA AS N'Giá' from VATTU", conn);
+                    "GIAMUA AS N'Giá' ,"+
+                    "SLTON as N'Số Lượng'," +
+                    "DVT as N'Loại'"+
+                    "from VATTU"
+                    , conn);
                 adt = new SqlDataAdapter(cmd);
                 adt.Fill(dt);
                 dataGridView1.DataSource = dt;
