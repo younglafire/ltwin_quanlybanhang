@@ -18,6 +18,7 @@ namespace quanlybanhang
         private void Form1_Load(object sender, EventArgs e)
         {
             LoadAllItems();
+            LoadAllCustomers();
         }
 
         private void LoadAllItems()
@@ -225,7 +226,14 @@ namespace quanlybanhang
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (tabControl1.SelectedIndex == 0)
+            {
+                LoadAllItems();
+            }
+            else if (tabControl1.SelectedIndex == 1)
+            {
+                LoadAllCustomers();
+            }
         }
 
         private void tabPage2_Click(object sender, EventArgs e)
@@ -246,6 +254,293 @@ namespace quanlybanhang
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        // ========== KHÁCH HÀNG (CUSTOMERS) TAB METHODS ==========
+
+        private bool ValidatePhoneNumber(string phoneNumber, out string errorMessage)
+        {
+            errorMessage = "";
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                return true; // Phone is optional
+            }
+
+            if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
+            {
+                errorMessage = "Số điện thoại phải có 10 hoặc 11 chữ số!";
+                return false;
+            }
+
+            // Check if all characters are digits
+            foreach (char c in phoneNumber)
+            {
+                if (!char.IsDigit(c))
+                {
+                    errorMessage = "Số điện thoại chỉ được chứa chữ số!";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void LoadAllCustomers()
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectstring))
+                using (var cmd = new SqlCommand(
+                    "SELECT MAKH AS [Mã KH], TENKH AS [Tên], DIACHI AS [Địa Chỉ], DT AS [SĐT], EMAIL AS [Email] FROM KHACHHANG",
+                    conn))
+                using (var adt = new SqlDataAdapter(cmd))
+                {
+                    var dt = new DataTable();
+                    adt.Fill(dt);
+                    dataGridView2.DataSource = dt;
+                    dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải dữ liệu khách hàng: " + ex.Message);
+            }
+        }
+
+        private void SearchCustomerByName(string name)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectstring))
+                using (var cmd = new SqlCommand(
+                    "SELECT MAKH AS [Mã KH], TENKH AS [Tên], DIACHI AS [Địa Chỉ], DT AS [SĐT], EMAIL AS [Email] " +
+                    "FROM KHACHHANG WHERE TENKH LIKE @name", conn))
+                {
+                    cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = "%" + name.Trim() + "%";
+
+                    using (var adt = new SqlDataAdapter(cmd))
+                    {
+                        var dt = new DataTable();
+                        adt.Fill(dt);
+                        dataGridView2.DataSource = dt;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tìm kiếm khách hàng: " + ex.Message);
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var key = textBox1.Text;
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                LoadAllCustomers();
+            }
+            else
+            {
+                SearchCustomerByName(key);
+            }
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button6.PerformClick();
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "";
+            LoadAllCustomers();
+            textBox1.Focus();
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(textBox5.Text))
+                {
+                    MessageBox.Show("Mã khách hàng không được để trống!");
+                    textBox5.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBox6.Text))
+                {
+                    MessageBox.Show("Tên khách hàng không được để trống!");
+                    textBox6.Focus();
+                    return;
+                }
+
+                // Validate phone number (10 or 11 digits or empty)
+                string phoneNumber = textBox3.Text.Trim();
+                string errorMessage;
+                if (!ValidatePhoneNumber(phoneNumber, out errorMessage))
+                {
+                    MessageBox.Show(errorMessage);
+                    textBox3.Focus();
+                    return;
+                }
+
+                using (var conn = new SqlConnection(connectstring))
+                {
+                    string strAdd = "INSERT INTO KHACHHANG (MAKH, TENKH, DIACHI, DT, EMAIL) " +
+                        "VALUES (@makh, @tenkh, @diachi, @dt, @email)";
+
+                    using (var comm = new SqlCommand(strAdd, conn))
+                    {
+                        comm.Parameters.AddWithValue("@makh", textBox5.Text);
+                        comm.Parameters.AddWithValue("@tenkh", textBox6.Text);
+                        comm.Parameters.AddWithValue("@diachi", string.IsNullOrWhiteSpace(textBox4.Text) ? (object)DBNull.Value : textBox4.Text);
+                        comm.Parameters.AddWithValue("@dt", string.IsNullOrWhiteSpace(textBox3.Text) ? (object)DBNull.Value : textBox3.Text);
+                        comm.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(textBox2.Text) ? (object)DBNull.Value : textBox2.Text);
+
+                        conn.Open();
+                        int i = comm.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Thêm khách hàng thành công!");
+                            LoadAllCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Thêm khách hàng thất bại!");
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627 || ex.Number == 2601) 
+                {
+                    MessageBox.Show("Không thể nhập trùng mã khách hàng!");
+                }
+                else
+                {
+                    MessageBox.Show("Lỗi kết nối: " + ex.Message);
+                }
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(textBox5.Text))
+                {
+                    MessageBox.Show("Mã khách hàng không được để trống!");
+                    textBox5.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBox6.Text))
+                {
+                    MessageBox.Show("Tên khách hàng không được để trống!");
+                    textBox6.Focus();
+                    return;
+                }
+
+                // Validate phone number (10 or 11 digits or empty)
+                string phoneNumber = textBox3.Text.Trim();
+                string errorMessage;
+                if (!ValidatePhoneNumber(phoneNumber, out errorMessage))
+                {
+                    MessageBox.Show(errorMessage);
+                    textBox3.Focus();
+                    return;
+                }
+
+                using (var conn = new SqlConnection(connectstring))
+                {
+                    string strUpdate = "UPDATE KHACHHANG SET TENKH = @tenkh, DIACHI = @diachi, " +
+                        "DT = @dt, EMAIL = @email WHERE MAKH = @makh";
+
+                    using (var comm = new SqlCommand(strUpdate, conn))
+                    {
+                        comm.Parameters.AddWithValue("@tenkh", textBox6.Text);
+                        comm.Parameters.AddWithValue("@diachi", string.IsNullOrWhiteSpace(textBox4.Text) ? (object)DBNull.Value : textBox4.Text);
+                        comm.Parameters.AddWithValue("@dt", string.IsNullOrWhiteSpace(textBox3.Text) ? (object)DBNull.Value : textBox3.Text);
+                        comm.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(textBox2.Text) ? (object)DBNull.Value : textBox2.Text);
+                        comm.Parameters.AddWithValue("@makh", textBox5.Text);
+
+                        conn.Open();
+                        int i = comm.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Cập nhật khách hàng thành công!");
+                            LoadAllCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Cập nhật khách hàng thất bại! - không thể đổi mã khách hàng! ");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi kết nối: " + ex.Message);
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectstring))
+                {
+                    string strDelete = "DELETE FROM KHACHHANG WHERE MAKH = @makh";
+                    using (var comm = new SqlCommand(strDelete, conn))
+                    {
+                        comm.Parameters.AddWithValue("@makh", textBox5.Text);
+                        conn.Open();
+                        int i = comm.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Xóa khách hàng thành công!");
+                            LoadAllCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Xóa khách hàng thất bại! Mã khách hàng không tồn tại hoặc đã bị ràng buộc.");
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 547) // Vi phạm ràng buộc khóa ngoại
+                {
+                    MessageBox.Show("Không thể xóa khách hàng vì có liên quan đến bảng khác!");
+                }
+                else
+                {
+                    MessageBox.Show("Lỗi kết nối: " + ex.Message);
+                }
+            }
+        }
+
+        private void dataGridView2_RowEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            int row = e.RowIndex;
+            textBox5.Text = dataGridView2.Rows[row].Cells["Mã KH"].Value?.ToString() ?? "";
+            textBox6.Text = dataGridView2.Rows[row].Cells["Tên"].Value?.ToString() ?? "";
+            textBox4.Text = dataGridView2.Rows[row].Cells["Địa Chỉ"].Value?.ToString() ?? "";
+            textBox3.Text = dataGridView2.Rows[row].Cells["SĐT"].Value?.ToString() ?? "";
+            textBox2.Text = dataGridView2.Rows[row].Cells["Email"].Value?.ToString() ?? "";
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         private void label12_Click(object sender, EventArgs e)
