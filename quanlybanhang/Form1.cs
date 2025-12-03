@@ -8,7 +8,7 @@ namespace quanlybanhang
 {
     public partial class Form1 : Form
     {
-        string connectstring = @"Data Source=B402-19B;Initial Catalog=QUANLYBANHANG;Integrated Security=True";
+        string connectstring = @"Data Source=B402-19;Initial Catalog=QUANLYBANHANG;Integrated Security=True";
 
         public Form1()
         {
@@ -216,6 +216,41 @@ namespace quanlybanhang
                     MessageBox.Show("Lỗi kết nối: " + ex.Message);
                 }
             }
+        }
+
+        private void tabPage1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox4_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label12_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
