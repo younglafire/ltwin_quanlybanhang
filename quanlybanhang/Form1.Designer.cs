@@ -598,6 +598,7 @@
             this.button11.TabIndex = 0;
             this.button11.Text = "Xoá";
             this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
             // button12
             // 
@@ -607,6 +608,7 @@
             this.button12.TabIndex = 0;
             this.button12.Text = "Tìm";
             this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
             // 
             // textBox7
             // 
@@ -614,6 +616,7 @@
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(311, 29);
             this.textBox7.TabIndex = 0;
+            this.textBox7.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox7_KeyDown);
             // 
             // groupBox6
             // 
@@ -730,6 +733,7 @@
             this.button13.TabIndex = 0;
             this.button13.Text = "Xoá";
             this.button13.UseVisualStyleBackColor = true;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
             // button14
             // 
@@ -739,6 +743,7 @@
             this.button14.TabIndex = 0;
             this.button14.Text = "Thoát";
             this.button14.UseVisualStyleBackColor = true;
+            this.button14.Click += new System.EventHandler(this.button14_Click);
             // 
             // button15
             // 
@@ -748,6 +753,7 @@
             this.button15.TabIndex = 0;
             this.button15.Text = "Sửa";
             this.button15.UseVisualStyleBackColor = true;
+            this.button15.Click += new System.EventHandler(this.button15_Click);
             // 
             // button16
             // 
@@ -757,6 +763,7 @@
             this.button16.TabIndex = 0;
             this.button16.Text = "Thêm";
             this.button16.UseVisualStyleBackColor = true;
+            this.button16.Click += new System.EventHandler(this.button16_Click);
             // 
             // dataGridView3
             // 
@@ -765,6 +772,7 @@
             this.dataGridView3.Name = "dataGridView3";
             this.dataGridView3.Size = new System.Drawing.Size(609, 358);
             this.dataGridView3.TabIndex = 8;
+            this.dataGridView3.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView3_RowEnter);
             // 
             // label18
             // 
