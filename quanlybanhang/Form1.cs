@@ -339,30 +339,48 @@ namespace quanlybanhang
             {
                 // Validate phone number (10 or 11 digits or empty)
                 string phoneNumber = textBox3.Text.Trim();
-                if (!string.IsNullOrEmpty(phoneNumber) && phoneNumber.Length != 10 && phoneNumber.Length != 11)
+                if (!string.IsNullOrEmpty(phoneNumber))
                 {
-                    MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
-                    return;
+                    if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
+                    {
+                        MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
+                        return;
+                    }
+                    // Check if all characters are digits
+                    foreach (char c in phoneNumber)
+                    {
+                        if (!char.IsDigit(c))
+                        {
+                            MessageBox.Show("Số điện thoại chỉ được chứa chữ số!");
+                            return;
+                        }
+                    }
                 }
 
-                using (var conn = new SqlConnection(connectstring)) ;
-                string strAdd = "INSERT INTO KHACHHANG (MAKH, TENKH, DIACHI, DT, EMAIL) " +
-                    "VALUES (N'" + textBox5.Text + "', N'" + textBox6.Text + "', N'" + textBox4.Text + "', " +
-                    (string.IsNullOrWhiteSpace(textBox3.Text) ? "NULL" : "'" + textBox3.Text + "'") + ", " +
-                    (string.IsNullOrWhiteSpace(textBox2.Text) ? "NULL" : "'" + textBox2.Text + "'") + ")";
-
-                using (var comm = new SqlCommand(strAdd, new SqlConnection(connectstring)))
+                using (var conn = new SqlConnection(connectstring))
                 {
-                    comm.Connection.Open();
-                    int i = comm.ExecuteNonQuery();
-                    if (i > 0)
+                    string strAdd = "INSERT INTO KHACHHANG (MAKH, TENKH, DIACHI, DT, EMAIL) " +
+                        "VALUES (@makh, @tenkh, @diachi, @dt, @email)";
+
+                    using (var comm = new SqlCommand(strAdd, conn))
                     {
-                        MessageBox.Show("Thêm khách hàng thành công!");
-                        LoadAllCustomers();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Thêm khách hàng thất bại!");
+                        comm.Parameters.AddWithValue("@makh", textBox5.Text);
+                        comm.Parameters.AddWithValue("@tenkh", textBox6.Text);
+                        comm.Parameters.AddWithValue("@diachi", string.IsNullOrWhiteSpace(textBox4.Text) ? (object)DBNull.Value : textBox4.Text);
+                        comm.Parameters.AddWithValue("@dt", string.IsNullOrWhiteSpace(textBox3.Text) ? (object)DBNull.Value : textBox3.Text);
+                        comm.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(textBox2.Text) ? (object)DBNull.Value : textBox2.Text);
+
+                        conn.Open();
+                        int i = comm.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Thêm khách hàng thành công!");
+                            LoadAllCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Thêm khách hàng thất bại!");
+                        }
                     }
                 }
             }
@@ -385,29 +403,48 @@ namespace quanlybanhang
             {
                 // Validate phone number (10 or 11 digits or empty)
                 string phoneNumber = textBox3.Text.Trim();
-                if (!string.IsNullOrEmpty(phoneNumber) && phoneNumber.Length != 10 && phoneNumber.Length != 11)
+                if (!string.IsNullOrEmpty(phoneNumber))
                 {
-                    MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
-                    return;
+                    if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
+                    {
+                        MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
+                        return;
+                    }
+                    // Check if all characters are digits
+                    foreach (char c in phoneNumber)
+                    {
+                        if (!char.IsDigit(c))
+                        {
+                            MessageBox.Show("Số điện thoại chỉ được chứa chữ số!");
+                            return;
+                        }
+                    }
                 }
 
-                using (var conn = new SqlConnection(connectstring)) ;
-                string strUpdate = "UPDATE KHACHHANG SET TENKH = N'" + textBox6.Text + "', DIACHI = N'" + textBox4.Text +
-                    "', DT = " + (string.IsNullOrWhiteSpace(textBox3.Text) ? "NULL" : "'" + textBox3.Text + "'") +
-                    ", EMAIL = " + (string.IsNullOrWhiteSpace(textBox2.Text) ? "NULL" : "'" + textBox2.Text + "'") +
-                    " WHERE MAKH = N'" + textBox5.Text + "'";
-                using (var comm = new SqlCommand(strUpdate, new SqlConnection(connectstring)))
+                using (var conn = new SqlConnection(connectstring))
                 {
-                    comm.Connection.Open();
-                    int i = comm.ExecuteNonQuery();
-                    if (i > 0)
+                    string strUpdate = "UPDATE KHACHHANG SET TENKH = @tenkh, DIACHI = @diachi, " +
+                        "DT = @dt, EMAIL = @email WHERE MAKH = @makh";
+
+                    using (var comm = new SqlCommand(strUpdate, conn))
                     {
-                        MessageBox.Show("Cập nhật khách hàng thành công!");
-                        LoadAllCustomers();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Cập nhật khách hàng thất bại! - không thể đổi mã khách hàng! ");
+                        comm.Parameters.AddWithValue("@tenkh", textBox6.Text);
+                        comm.Parameters.AddWithValue("@diachi", string.IsNullOrWhiteSpace(textBox4.Text) ? (object)DBNull.Value : textBox4.Text);
+                        comm.Parameters.AddWithValue("@dt", string.IsNullOrWhiteSpace(textBox3.Text) ? (object)DBNull.Value : textBox3.Text);
+                        comm.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(textBox2.Text) ? (object)DBNull.Value : textBox2.Text);
+                        comm.Parameters.AddWithValue("@makh", textBox5.Text);
+
+                        conn.Open();
+                        int i = comm.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Cập nhật khách hàng thành công!");
+                            LoadAllCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Cập nhật khách hàng thất bại! - không thể đổi mã khách hàng! ");
+                        }
                     }
                 }
             }
