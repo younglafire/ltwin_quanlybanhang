@@ -573,6 +573,7 @@ namespace quanlybanhang
                 using (var cmd = new SqlCommand(
                     @"SELECT 
                         c.MAHD AS [Mã HĐ], 
+                        h.NGAY AS [Ngày],
                         k.TENKH AS [Tên KH], 
                         v.TENVT AS [Vật tư], 
                         c.SL AS [Số lượng], 
@@ -605,6 +606,7 @@ namespace quanlybanhang
                 using (var cmd = new SqlCommand(
                     @"SELECT 
                         c.MAHD AS [Mã HĐ], 
+                        h.NGAY AS [Ngày],
                         k.TENKH AS [Tên KH], 
                         v.TENVT AS [Vật tư], 
                         c.SL AS [Số lượng], 
