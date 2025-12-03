@@ -258,6 +258,33 @@ namespace quanlybanhang
 
         // ========== KHÁCH HÀNG (CUSTOMERS) TAB METHODS ==========
 
+        private bool ValidatePhoneNumber(string phoneNumber, out string errorMessage)
+        {
+            errorMessage = "";
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                return true; // Phone is optional
+            }
+
+            if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
+            {
+                errorMessage = "Số điện thoại phải có 10 hoặc 11 chữ số!";
+                return false;
+            }
+
+            // Check if all characters are digits
+            foreach (char c in phoneNumber)
+            {
+                if (!char.IsDigit(c))
+                {
+                    errorMessage = "Số điện thoại chỉ được chứa chữ số!";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void LoadAllCustomers()
         {
             try
@@ -337,24 +364,29 @@ namespace quanlybanhang
         {
             try
             {
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(textBox5.Text))
+                {
+                    MessageBox.Show("Mã khách hàng không được để trống!");
+                    textBox5.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBox6.Text))
+                {
+                    MessageBox.Show("Tên khách hàng không được để trống!");
+                    textBox6.Focus();
+                    return;
+                }
+
                 // Validate phone number (10 or 11 digits or empty)
                 string phoneNumber = textBox3.Text.Trim();
-                if (!string.IsNullOrEmpty(phoneNumber))
+                string errorMessage;
+                if (!ValidatePhoneNumber(phoneNumber, out errorMessage))
                 {
-                    if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
-                    {
-                        MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
-                        return;
-                    }
-                    // Check if all characters are digits
-                    foreach (char c in phoneNumber)
-                    {
-                        if (!char.IsDigit(c))
-                        {
-                            MessageBox.Show("Số điện thoại chỉ được chứa chữ số!");
-                            return;
-                        }
-                    }
+                    MessageBox.Show(errorMessage);
+                    textBox3.Focus();
+                    return;
                 }
 
                 using (var conn = new SqlConnection(connectstring))
@@ -401,24 +433,29 @@ namespace quanlybanhang
         {
             try
             {
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(textBox5.Text))
+                {
+                    MessageBox.Show("Mã khách hàng không được để trống!");
+                    textBox5.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(textBox6.Text))
+                {
+                    MessageBox.Show("Tên khách hàng không được để trống!");
+                    textBox6.Focus();
+                    return;
+                }
+
                 // Validate phone number (10 or 11 digits or empty)
                 string phoneNumber = textBox3.Text.Trim();
-                if (!string.IsNullOrEmpty(phoneNumber))
+                string errorMessage;
+                if (!ValidatePhoneNumber(phoneNumber, out errorMessage))
                 {
-                    if (phoneNumber.Length != 10 && phoneNumber.Length != 11)
-                    {
-                        MessageBox.Show("Số điện thoại phải có 10 hoặc 11 chữ số!");
-                        return;
-                    }
-                    // Check if all characters are digits
-                    foreach (char c in phoneNumber)
-                    {
-                        if (!char.IsDigit(c))
-                        {
-                            MessageBox.Show("Số điện thoại chỉ được chứa chữ số!");
-                            return;
-                        }
-                    }
+                    MessageBox.Show(errorMessage);
+                    textBox3.Focus();
+                    return;
                 }
 
                 using (var conn = new SqlConnection(connectstring))
